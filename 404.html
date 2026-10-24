@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-        <link rel="icon" href="https://pengs.onrender.com/favicon.png">
     <meta name="robots" content="noindex">
     <title>Redirecting...</title>
 </head>
@@ -38,68 +37,71 @@
                 return;
             }
 
-            // 途中にフォルダ名が挟まっていても、短縮コードの始まり（W, T, Y, I, J, O, D, S, U, P, F）を探して取得する
             var codePath = "";
             for (var j = 0; j < pathSegments.length; j++) {
                 var seg = pathSegments[j];
-                // O（ディスカッション）または指定のプレフィックスで始まるかチェック
-                if (seg === "O" || /^[WTYIJDSOUPF]/i.test(seg)) {
+                if (seg.toUpperCase() === "O" || /^[WTYIJDSOUPF]/i.test(seg)) {
                     codePath = pathSegments.slice(j).join('/');
                     break;
                 }
             }
 
-            // 万が一見つからない場合は最後のセグメントをフォールバックとして使う
             if (!codePath && pathSegments.length > 0) {
                 codePath = pathSegments[pathSegments.length - 1];
             }
 
             var targetUrl = "";
 
-            if (codePath.indexOf("W") === 0) {
-                targetUrl = "https://ja.scratch-wiki.info/wiki/" + codePath.substring(1);
-            } else if (codePath.indexOf("T") === 0) {
-                var idT = decodeBase62(codePath.substring(1));
-                targetUrl = "https://turbowarp.org/" + idT;
-            } else if (codePath.indexOf("Y") === 0) {
-                targetUrl = "https://scratch.mit.edu/discuss/youtube/" + codePath.substring(1);
-            } else if (codePath.indexOf("I") === 0) {
-                var idI = decodeBase62(codePath.substring(1));
-                targetUrl = "https://uploads.scratch.mit.edu/get_image/project/" + idI;
-            } else if (codePath.indexOf("J") === 0) {
-                var idJ = decodeBase62(codePath.substring(1));
-                targetUrl = "https://uploads.scratch.mit.edu/get_image/studio/" + idJ;
-            } else if (codePath === "O") {
-                targetUrl = "https://scratch.mit.edu/discuss/";
-            } else if (codePath.indexOf("D") === 0) {
-                var partsD = codePath.substring(1).split("/C");
-                var topicId = decodeBase62(partsD[0]);
-                targetUrl = "https://scratch.mit.edu/discuss/topic/" + topicId;
-                if (partsD[1]) {
-                    targetUrl += "#post-" + decodeBase62(partsD[1]);
+            if (codePath) {
+                // 最初の1文字（プレフィックス）は大文字・小文字どちらでも動くように大文字化
+                var prefix = codePath.charAt(0).toUpperCase();
+                var rest = codePath.substring(1); // 2文字目以降はケースをそのまま保持
+
+                if (prefix === "W") {
+                    targetUrl = "https://ja.scratch-wiki.info/wiki/" + rest;
+                } else if (prefix === "T") {
+                    var idT = decodeBase62(rest);
+                    targetUrl = "https://turbowarp.org/" + idT;
+                } else if (prefix === "Y") {
+                    targetUrl = "https://scratch.mit.edu/discuss/youtube/" + rest;
+                } else if (prefix === "I") {
+                    var idI = decodeBase62(rest);
+                    targetUrl = "https://uploads.scratch.mit.edu/get_image/project/" + idI;
+                } else if (prefix === "J") {
+                    var idJ = decodeBase62(rest);
+                    targetUrl = "https://uploads.scratch.mit.edu/get_image/studio/" + idJ;
+                } else if (codePath.toUpperCase() === "O") {
+                    targetUrl = "https://scratch.mit.edu/discuss/";
+                } else if (prefix === "D") {
+                    var partsD = rest.split("/C");
+                    var topicId = decodeBase62(partsD[0]);
+                    targetUrl = "https://scratch.mit.edu/discuss/topic/" + topicId;
+                    if (partsD[1]) {
+                        targetUrl += "#post-" + decodeBase62(partsD[1]);
+                    }
+                } else if (prefix === "S") {
+                    var idS = decodeBase62(rest);
+                    targetUrl = "https://scratch.mit.edu/studios/" + idS;
+                } else if (prefix === "U") {
+                    targetUrl = "https://scratch.mit.edu/users/" + rest;
+                } else if (prefix === "P") {
+                    var partsP = rest.split("/");
+                    var idP = decodeBase62(partsP[0]);
+                    targetUrl = "https://scratch.mit.edu/projects/" + idP;
+                    if (partsP[1] === "E" || partsP[1] === "e") {
+                        targetUrl += "/E";
+                    } else if (partsP[1] === "埋") {
+                        targetUrl += "/embed";
+                    } else if (partsP[1] === "全") {
+                        targetUrl += "/fullscreen";
+                    } else if (partsP[1] && partsP[1].charAt(0).toUpperCase() === "C") {
+                        targetUrl += "#comments-" + decodeBase62(partsP[1].substring(1));
+                    }
+                } else if (prefix === "F") {
+                    var partsF = rest.split("/");
+                    var user = partsF[1] ? partsF[1] : "scratch";
+                    targetUrl = "https://scratch.mit.edu/emails/welcome/" + user + "/1/";
                 }
-            } else if (codePath.indexOf("S") === 0) {
-                var idS = decodeBase62(codePath.substring(1));
-                targetUrl = "https://scratch.mit.edu/studios/" + idS;
-            } else if (codePath.indexOf("U") === 0) {
-                targetUrl = "https://scratch.mit.edu/users/" + codePath.substring(1);
-            } else if (codePath.indexOf("P") === 0) {
-                var partsP = codePath.split("/");
-                var idP = decodeBase62(partsP[0].substring(1));
-                targetUrl = "https://scratch.mit.edu/projects/" + idP;
-                if (partsP[1] === "E") {
-                    targetUrl += "/E";
-                } else if (partsP[1] === "埋") {
-                    targetUrl += "/embed";
-                } else if (partsP[1] === "全") {
-                    targetUrl += "/fullscreen";
-                } else if (partsP[1] && partsP[1].indexOf("C") === 0) {
-                    targetUrl += "#comments-" + decodeBase62(partsP[1].substring(1));
-                }
-            } else if (codePath.indexOf("F") === 0) {
-                var partsF = codePath.split("/");
-                var user = partsF[1] ? partsF[1] : "scratch";
-                targetUrl = "https://scratch.mit.edu/emails/welcome/" + user + "/1/";
             }
 
             if (targetUrl) {
