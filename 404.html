@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <title>Redirecting...</title>
+    <link rel="icon" href="https://pengs.onrender.com/favicon.png">
+</head>
+<body>
+    <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
+        <h2>リダイレクト中...</h2>
+        <p id="msg">読み込み中...</p>
+    </div>
+
+    <script type="text/javascript">
+        var BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        function decodeBase62(str) {
+            var num = 0;
+            for (var i = 0; i < str.length; i++) {
+                num = num * 62 + BASE62.indexOf(str.charAt(i));
+            }
+            return num;
+        }
+
+        (function() {
+            var pathname = location.pathname;
+            var segments = pathname.split('/');
+            var pathSegments = [];
+            for (var i = 0; i < segments.length; i++) {
+                if (segments[i].length > 0 && segments[i] !== "index.html") {
+                    // 各セグメントをデコードしてひらがな・漢字に対応
+                    pathSegments.push(decodeURIComponent(segments[i]));
+                }
+            }
+
+            if (pathSegments.length === 0) {
+                location.replace("./");
+                return;
+            }
+
+            var codePath = pathSegments.join('/');
+            var targetUrl = "";
+
+            if (codePath.indexOf("W") === 0) {
+                targetUrl = "https://ja.scratch-wiki.info/wiki/" + codePath.substring(1);
+            } else if (codePath.indexOf("T") === 0) {
+                var idT = decodeBase62(codePath.substring(1));
+                targetUrl = "https://turbowarp.org/" + idT;
+            } else if (codePath.indexOf("Y") === 0) {
+                targetUrl = "https://scratch.mit.edu/discuss/youtube/" + codePath.substring(1);
+            } else if (codePath.indexOf("I") === 0) {
+                var idI = decodeBase62(codePath.substring(1));
+                targetUrl = "https://uploads.scratch.mit.edu/get_image/project/" + idI;
+            } else if (codePath.indexOf("J") === 0) {
+                var idJ = decodeBase62(codePath.substring(1));
+                targetUrl = "https://uploads.scratch.mit.edu/get_image/studio/" + idJ;
+            } else if (codePath === "O") {
+                targetUrl = "https://scratch.mit.edu/discuss/";
+            } else if (codePath.indexOf("D") === 0) {
+                var partsD = codePath.substring(1).split("/C");
+                var topicId = decodeBase62(partsD[0]);
+                targetUrl = "https://scratch.mit.edu/discuss/topic/" + topicId;
+                if (partsD[1]) {
+                    targetUrl += "#post-" + decodeBase62(partsD[1]);
+                }
+            } else if (codePath.indexOf("S") === 0) {
+                var idS = decodeBase62(codePath.substring(1));
+                targetUrl = "https://scratch.mit.edu/studios/" + idS;
+            } else if (codePath.indexOf("U") === 0) {
+                targetUrl = "https://scratch.mit.edu/users/" + codePath.substring(1);
+            } else if (codePath.indexOf("P") === 0) {
+                var partsP = codePath.split("/");
+                var idP = decodeBase62(partsP[0].substring(1));
+                targetUrl = "https://scratch.mit.edu/projects/" + idP;
+                if (partsP[1] === "E") {
+                    targetUrl += "/E";
+                } else if (partsP[1] === "埋") {
+                    targetUrl += "/embed";
+                } else if (partsP[1] === "全") {
+                    targetUrl += "/fullscreen";
+                } else if (partsP[1] && partsP[1].indexOf("C") === 0) {
+                    targetUrl += "#comments-" + decodeBase62(partsP[1].substring(1));
+                }
+            } else if (codePath.indexOf("F") === 0) {
+                var partsF = codePath.split("/");
+                var user = partsF[1] ? partsF[1] : "scratch";
+                targetUrl = "https://scratch.mit.edu/emails/welcome/" + user + "/1/";
+            }
+
+            if (targetUrl) {
+                var msgEl = document.getElementById('msg');
+                if (msgEl) {
+                    msgEl.innerHTML = '<a href="' + targetUrl + '">' + targetUrl + '</a> へ移動しています...';
+                }
+                location.replace(targetUrl);
+            } else {
+                var msgEl2 = document.getElementById('msg');
+                if (msgEl2) {
+                    msgEl2.innerText = "無効な短縮リンクです。";
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
