@@ -2,9 +2,9 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+        <link rel="icon" href="https://pengs.onrender.com/favicon.png">
     <meta name="robots" content="noindex">
     <title>Redirecting...</title>
-    <link rel="icon" href="https://pengs.onrender.com/favicon.png">
 </head>
 <body>
     <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
@@ -29,7 +29,6 @@
             var pathSegments = [];
             for (var i = 0; i < segments.length; i++) {
                 if (segments[i].length > 0 && segments[i] !== "index.html") {
-                    // 各セグメントをデコードしてひらがな・漢字に対応
                     pathSegments.push(decodeURIComponent(segments[i]));
                 }
             }
@@ -39,7 +38,22 @@
                 return;
             }
 
-            var codePath = pathSegments.join('/');
+            // 途中にフォルダ名が挟まっていても、短縮コードの始まり（W, T, Y, I, J, O, D, S, U, P, F）を探して取得する
+            var codePath = "";
+            for (var j = 0; j < pathSegments.length; j++) {
+                var seg = pathSegments[j];
+                // O（ディスカッション）または指定のプレフィックスで始まるかチェック
+                if (seg === "O" || /^[WTYIJDSOUPF]/i.test(seg)) {
+                    codePath = pathSegments.slice(j).join('/');
+                    break;
+                }
+            }
+
+            // 万が一見つからない場合は最後のセグメントをフォールバックとして使う
+            if (!codePath && pathSegments.length > 0) {
+                codePath = pathSegments[pathSegments.length - 1];
+            }
+
             var targetUrl = "";
 
             if (codePath.indexOf("W") === 0) {
