@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">    <link rel="icon" href="https://pengs.onrender.com/favicon.png">
     <meta name="robots" content="noindex">
     <title>Redirecting...</title>
 </head>
@@ -37,10 +37,12 @@
                 return;
             }
 
+            // フォルダ名に誤爆しないよう、後ろから厳密に短縮コード（W,T,Y,I,J,O,D,S,U,P,Fで始まるもの）を探す
             var codePath = "";
-            for (var j = 0; j < pathSegments.length; j++) {
+            for (var j = pathSegments.length - 1; j >= 0; j--) {
                 var seg = pathSegments[j];
-                if (seg.toUpperCase() === "O" || /^[WTYIJDSOUPF]/i.test(seg)) {
+                // O または 各プレフィックスで始まる正しい形式のセグメントかチェック
+                if (seg.toUpperCase() === "O" || /^[WTYIJDSOUPF][a-zA-Z0-9_\-\/]*$/i.test(seg)) {
                     codePath = pathSegments.slice(j).join('/');
                     break;
                 }
@@ -53,9 +55,9 @@
             var targetUrl = "";
 
             if (codePath) {
-                // 最初の1文字（プレフィックス）は大文字・小文字どちらでも動くように大文字化
+                // 最初の1文字は大文字・小文字どちらでもOKにする
                 var prefix = codePath.charAt(0).toUpperCase();
-                var rest = codePath.substring(1); // 2文字目以降はケースをそのまま保持
+                var rest = codePath.substring(1);
 
                 if (prefix === "W") {
                     targetUrl = "https://ja.scratch-wiki.info/wiki/" + rest;
