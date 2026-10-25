@@ -113,7 +113,8 @@
         <p><a href="http://s0.f5.si/usuisotaro?大感謝です｡黒沢牧場にも行ってきたいし私には告白したい彼女がいます/">suisotaro</a>さんの<a href="http://s0.f5.si/PdZhnH?なぜかまじ卍">scratchの短縮URL! v3.1</a>という作品を見て､｢もっ<saki>といろんな機</saki>能が欲しい！｣と思って作りました｡<br><a href="http://s0.f5.si/usuisotaro?Scratchで使っちゃいけない青い鳥/">suisotaro</a>さんにまじ感謝！</p>
     </div>
     <footer>
-            <iframe src="https://scratch.mit.edu/projects/1393853903/embed" allowtransparency="true" width="600" height="517" frameborder="0" scrolling="no" allowfullscreen></iframe>
+            <iframe src="https://scratch.mit.edu/projects/1395460887/embed" allowtransparency="true" width="600" height="517" frameborder="0" scrolling="no" allowfullscreen></iframe>
+        <br>
         &copy;2026 Satsuki700 All Rights Reserved.
     </footer>
 
@@ -210,9 +211,22 @@
 
         function copyUrl() {
             const shortUrlOutput = document.getElementById('shortUrlOutput');
-            shortUrlOutput.select();
-            shortUrlOutput.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(shortUrlOutput.value).then(() => {
+            const textToCopy = shortUrlOutput.value;
+
+            if (!textToCopy) return;
+
+            // クリップボードへ確実に短縮URLを書き込み
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                shortUrlOutput.focus();
+                shortUrlOutput.select();
+                const msg = document.getElementById('copyMsg');
+                msg.style.display = "block";
+                setTimeout(() => { msg.style.display = "none"; }, 2000);
+            }).catch(err => {
+                // 万が一Clipboard APIが使えない環境向けのフォールバック
+                shortUrlOutput.focus();
+                shortUrlOutput.select();
+                document.execCommand('copy');
                 const msg = document.getElementById('copyMsg');
                 msg.style.display = "block";
                 setTimeout(() => { msg.style.display = "none"; }, 2000);
