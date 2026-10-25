@@ -144,33 +144,59 @@
 
             let codePath = "";
 
-            if (rawUrl.includes("api.scratch.mit.edu/users/") && rawUrl.includes("/messages/count")) {
+            // --- 判定ロジック（優先度が高い順） ---
+
+            // 1. API: メッセージ数
+            if (rawUrl.includes("api.scratch.mit.edu") && rawUrl.includes("/messages/count")) {
                 const match = rawUrl.match(/\/users\/([^\/]+)\/messages\/count/);
                 if (match) codePath = "M" + match[1];
-            } else if (rawUrl.includes("api.scratch.mit.edu/users/")) {
+            } 
+            // 2. API: ユーザー基本情報
+            else if (rawUrl.includes("api.scratch.mit.edu") && rawUrl.includes("/users/")) {
                 const match = rawUrl.match(/\/users\/([^\/\?#]+)/);
                 if (match) codePath = "B" + match[1];
-            } else if (rawUrl.includes("ja.scratch-wiki.info")) {
+            } 
+            // 3. 通常: ユーザーページ (scratch.mit.edu/users/...)
+            else if (rawUrl.includes("/users/")) {
+                const match = rawUrl.match(/\/users\/([^\/\?#]+)/);
+                if (match) codePath = "U" + match[1];
+            } 
+            // 4. Scratch Wiki
+            else if (rawUrl.includes("ja.scratch-wiki.info")) {
                 const wikiPage = rawUrl.split("/wiki/")[1] || "";
                 codePath = "W" + decodeURIComponent(wikiPage);
-            } else if (rawUrl.includes("turbowarp.org")) {
+            } 
+            // 5. TurboWarp
+            else if (rawUrl.includes("turbowarp.org")) {
                 const match = rawUrl.match(/\/(\d+)/);
                 if (match) codePath = "T" + encodeBase62(parseInt(match[1]));
-            } else if (rawUrl.includes("discuss/youtube/")) {
+            } 
+            // 6. YouTube 埋め込み (Discuss)
+            else if (rawUrl.includes("discuss/youtube/")) {
                 const ytId = rawUrl.split("discuss/youtube/")[1].split("?")[0];
                 codePath = "Y" + ytId;
-            } else if (rawUrl.includes("uploads.scratch.mit.edu/get_image/project/")) {
+            } 
+            // 7. 画像: プロジェクトサムネイル
+            else if (rawUrl.includes("uploads.scratch.mit.edu/get_image/project/")) {
                 const match = rawUrl.match(/project\/(\d+)/);
                 if (match) codePath = "I" + encodeBase62(parseInt(match[1]));
-            } else if (rawUrl.includes("uploads.scratch.mit.edu/get_image/gallery/")) {
+            } 
+            // 8. 画像: スタジオ/ギャラリーサムネイル
+            else if (rawUrl.includes("uploads.scratch.mit.edu/get_image/gallery/")) {
                 const match = rawUrl.match(/gallery\/(\d+)/);
                 if (match) codePath = "J" + encodeBase62(parseInt(match[1]));
-            } else if (rawUrl.match(/\/discuss\/?$/) || rawUrl.includes("Scratch Around the World")) {
+            } 
+            // 9. フォーラムトップ / Around the World
+            else if (rawUrl.match(/\/discuss\/?$/) || rawUrl.includes("Scratch Around the World")) {
                 codePath = "O";
-            } else if (rawUrl.includes("scratch.mit.edu/emails/welcome/")) {
+            } 
+            // 10. ウェルカムメール
+            else if (rawUrl.includes("scratch.mit.edu/emails/welcome/")) {
                 const match = rawUrl.match(/\/welcome\/([^\/]+)/);
                 codePath = match ? "F/" + match[1] : "F";
-            } else if (rawUrl.includes("/discuss/topic/")) {
+            } 
+            // 11. フォーラムトピック
+            else if (rawUrl.includes("/discuss/topic/")) {
                 const match = rawUrl.match(/\/topic\/(\d+)/);
                 if (match) {
                     codePath = "D" + encodeBase62(parseInt(match[1]));
@@ -179,13 +205,14 @@
                         if (postMatch) codePath += "/C" + encodeBase62(parseInt(postMatch[1]));
                     }
                 }
-            } else if (rawUrl.includes("/studios/")) {
+            } 
+            // 12. スタジオ
+            else if (rawUrl.includes("/studios/")) {
                 const match = rawUrl.match(/\/studios\/(\d+)/);
                 if (match) codePath = "S" + encodeBase62(parseInt(match[1]));
-            } else if (rawUrl.includes("/users/")) {
-                const match = rawUrl.match(/\/users\/([^\/\?#]+)/);
-                if (match) codePath = "U" + match[1];
-            } else if (rawUrl.includes("/projects/")) {
+            } 
+            // 13. プロジェクト (Editor/Embed/Fullscreen/Comments対応)
+            else if (rawUrl.includes("/projects/")) {
                 const match = rawUrl.match(/\/projects\/(\d+)/);
                 if (match) {
                     codePath = "P" + encodeBase62(parseInt(match[1]));
