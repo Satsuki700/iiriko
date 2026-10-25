@@ -11,7 +11,7 @@
         <h2>Satsuki700のScratch短縮リンク<br>リダイレクト中...</h2>
         <img src="https://uploads.scratch.mit.edu/get_image/project/1288040315_600x450.png" alt="Satsuki700挨拶">
         <p id="msg">読み込み中...</p>
-        <p style="margin-top: 50px; font-size: 14px; color: #666;">©2026 Satsuki700 All Rights Reserved.</p>
+        <p style="margin-top: 50px; font-size: 14px; color: #666;">&copy;2026 Satsuki700 All Rights Reserved.</p>
     </div>
 
     <script type="text/javascript">
@@ -43,7 +43,8 @@
             var codePath = "";
             for (var j = pathSegments.length - 1; j >= 0; j--) {
                 var seg = pathSegments[j];
-                if (seg.toUpperCase() === "O" || /^[WTYIJDSOUPF][a-zA-Z0-9_\-\/]*$/i.test(seg)) {
+                // M と B のプレフィックス判定を追加
+                if (seg.toUpperCase() === "O" || /^[WTYIJDSMBUPF][a-zA-Z0-9_\-\/]*$/i.test(seg)) {
                     codePath = pathSegments.slice(j).join('/');
                     break;
                 }
@@ -85,9 +86,6 @@
                 } else if (prefix === "IU") {
                     var idIU = decodeBase62(rest);
                     targetUrl = "https://uploads.scratch.mit.edu/get_image/user/" + idIU + "_400x400.png";
-                } else if (prefix === "I") {
-                    var idI = decodeBase62(rest);
-                    targetUrl = "https://uploads.scratch.mit.edu/projects/thumbnails/" + idI + ".png";
                 } else if (prefix === "J") {
                     var idJ = decodeBase62(rest);
                     targetUrl = "https://uploads.scratch.mit.edu/galleries/thumbnails/" + idJ + ".png";
@@ -105,6 +103,12 @@
                     targetUrl = "https://scratch.mit.edu/studios/" + idS;
                 } else if (prefix === "U") {
                     targetUrl = "https://scratch.mit.edu/users/" + rest;
+                } else if (prefix === "M") {
+                    // メッセージ数 API
+                    targetUrl = "https://api.scratch.mit.edu/users/" + rest + "/messages/count";
+                } else if (prefix === "B") {
+                    // ユーザー情報 API
+                    targetUrl = "https://api.scratch.mit.edu/users/" + rest;
                 } else if (prefix === "P") {
                     var partsP = rest.split("/");
                     var idP = decodeBase62(partsP[0]);
