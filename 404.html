@@ -2,232 +2,141 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <link rel="icon" href="https://pengs.onrender.com/favicon.png">
     <meta name="robots" content="noindex">
-    <title>Scratch URL Shortener</title>
-    <!-- ウェブアイコン：メモ帳 -->
-    <link rel="icon" href="https://satsuki700.neocities.org/jrjatmk2tj7mw/vKiLouw7/lpM2U.png">
-    <style>
-        body {
-            font-family: sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-        }
-        input[type="text"], select {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0 15px 0;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #ff8c00;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        button:hover {
-            background-color: #e07b00;
-        }
-        .copy-btn {
-            background-color: #4CAF50;
-        }
-        .copy-btn:hover {
-            background-color: #45a049;
-        }
-        .result-box, .info-box {
-            margin-top: 20px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            word-break: break-all;
-        }
-        .result-box {
-            display: none;
-        }
-        .spacer {
-            margin-top: 25px;
-        }
-        #copyMsg {
-            font-size: 12px;
-            color: green;
-            margin-top: 5px;
-            display: none;
-        }
-        footer {
-            margin-top: 40px;
-            text-align: center;
-            font-size: 12px;
-            color: #777;
-        }
-    </style>
+    <title>Satsuki700のScratch短縮リンクRedirecting...</title>
+        <link rel="icon" href="https://pengs.onrender.com/favicon.png">
 </head>
 <body>
+    <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
+        <h2>Satsuki700のScratch短縮リンク<br>リダイレクト中...</h2><img src="https://uploads.scratch.mit.edu/get_image/project/1288040315_600x450.png" alt="Satsuki700挨拶">
 
-    <h2>Scratch URL Shortener</h2>
-    <p>ScratchやWiki、TurboWarpのURLを入力してね（オプションは自動判定するよ）。</p>
-    
-    <label for="protocolSelect">プロトコル選択:</label>
-    <select id="protocolSelect">
-        <option value="https://">https://</option>
-        <option value="http://">http://</option>
-    </select>
-
-    <label for="inputUrl">URL:</label>
-    <input type="text" id="inputUrl" placeholder="例: https://scratch.mit.edu/projects/1146420418/editor/">
-
-    <button onclick="generate()">短縮リンクを発行</button>
-
-    <!-- 結果表示エリア -->
-    <div class="result-box" id="resultBox">
-        <div class="spacer">
-            <strong>短縮URL:</strong><br>
-            <input type="text" id="shortUrlOutput" readonly onclick="this.select()">
-            <button class="copy-btn" onclick="copyUrl()">リンクをコピー</button>
-            <div id="copyMsg">コピーしました！</div>
-        </div>
+        <p id="msg">読み込み中...</p>
     </div>
 
-    <!-- リンク情報 -->
-    <div class="info-box">
-        <p style="text-align: center; margin: 0;">
-            [前回] <a href="https://scratch.mit.edu/projects/1267678157" target="_blank">https://scratch.mit.edu/projects/1267678157</a><br>
-            [次回] <a href="https://scratch.mit.edu/projects/1268832684" target="_blank">https://scratch.mit.edu/projects/1268832684</a>
-        </p>
-    </div>
+    <script type="text/javascript">
+        var BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    <footer>
-        &copy;2026 Satsuki700 All Rights Reserved.
-    </footer>
-
-    <script>
-        const BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        
-        function encodeBase62(num) {
-            if (num === 0) return "0";
-            let res = "";
-            while (num > 0) {
-                res = BASE62[num % 62] + res;
-                num = Math.floor(num / 62);
+        function decodeBase62(str) {
+            var num = 0;
+            for (var i = 0; i < str.length; i++) {
+                num = num * 62 + BASE62.indexOf(str.charAt(i));
             }
-            return res;
+            return num;
         }
 
-        function generate() {
-            const rawUrl = document.getElementById('inputUrl').value.trim();
-            const protocol = document.getElementById('protocolSelect').value;
-            const resultBox = document.getElementById('resultBox');
-            const shortUrlOutput = document.getElementById('shortUrlOutput');
+        (function() {
+            var pathname = location.pathname;
+            var segments = pathname.split('/');
+            var pathSegments = [];
+            for (var i = 0; i < segments.length; i++) {
+                if (segments[i].length > 0 && segments[i] !== "index.html") {
+                    pathSegments.push(decodeURIComponent(segments[i]));
+                }
+            }
 
-            if (!rawUrl) {
-                alert("URLを入力してください。");
+            if (pathSegments.length === 0) {
+                location.replace("./");
                 return;
             }
 
-            let codePath = "";
-
-            if (rawUrl.includes("ja.scratch-wiki.info")) {
-                const wikiPage = rawUrl.split("/wiki/")[1] || "";
-                codePath = "W" + decodeURIComponent(wikiPage);
-            } else if (rawUrl.includes("turbowarp.org")) {
-                const match = rawUrl.match(/\/(\d+)/);
-                if (match) codePath = "T" + encodeBase62(parseInt(match[1]));
-            } else if (rawUrl.includes("discuss/youtube/")) {
-                const ytId = rawUrl.split("discuss/youtube/")[1].split("?")[0];
-                codePath = "Y" + ytId;
-            } else if (rawUrl.includes("uploads.scratch.mit.edu")) {
-                if (rawUrl.includes("projects/thumbnails/")) {
-                    const match = rawUrl.match(/thumbnails\/(\d+)/);
-                    if (match) codePath = "IT" + encodeBase62(parseInt(match[1]));
-                } else if (rawUrl.includes("galleries/thumbnails/")) {
-                    const match = rawUrl.match(/thumbnails\/(\d+)/);
-                    if (match) codePath = "IG" + encodeBase62(parseInt(match[1]));
-                } else if (rawUrl.includes("get_image/user/")) {
-                    const match = rawUrl.match(/user\/(\d+)/);
-                    if (match) codePath = "IU" + encodeBase62(parseInt(match[1]));
-                } else if (rawUrl.includes("get_image/project/")) {
-                    const match = rawUrl.match(/project\/(\d+)/);
-                    if (match) codePath = "I" + encodeBase62(parseInt(match[1]));
-                } else if (rawUrl.includes("get_image/studio/")) {
-                    const match = rawUrl.match(/studio\/(\d+)/);
-                    if (match) codePath = "J" + encodeBase62(parseInt(match[1]));
-                }
-            } else if (rawUrl.match(/\/discuss\/?$/) || rawUrl.includes("Scratch Around the World")) {
-                codePath = "O";
-            } else if (rawUrl.includes("scratch.mit.edu/emails/welcome/")) {
-                const match = rawUrl.match(/\/welcome\/([^\/]+)/);
-                codePath = match ? "F/" + match[1] : "F";
-            } else if (rawUrl.includes("/discuss/topic/")) {
-                const match = rawUrl.match(/\/topic\/(\d+)/);
-                if (match) {
-                    codePath = "D" + encodeBase62(parseInt(match[1]));
-                    if (rawUrl.includes("#post-")) {
-                        const postMatch = rawUrl.match(/#post-(\d+)/);
-                        if (postMatch) codePath += "/C" + encodeBase62(parseInt(postMatch[1]));
-                    }
-                }
-            } else if (rawUrl.includes("/studios/")) {
-                const match = rawUrl.match(/\/studios\/(\d+)/);
-                if (match) codePath = "S" + encodeBase62(parseInt(match[1]));
-            } else if (rawUrl.includes("/users/")) {
-                const match = rawUrl.match(/\/users\/([^\/\?#]+)/);
-                if (match) codePath = "U" + match[1];
-            } else if (rawUrl.includes("/projects/")) {
-                const match = rawUrl.match(/\/projects\/(\d+)/);
-                if (match) {
-                    codePath = "P" + encodeBase62(parseInt(match[1]));
-                    if (rawUrl.includes("/editor")) {
-                        codePath += "/E";
-                    } else if (rawUrl.includes("/embed")) {
-                        codePath += "/埋";
-                    } else if (rawUrl.includes("/fullscreen")) {
-                        codePath += "/全";
-                    } else if (rawUrl.includes("#comments-")) {
-                        const comMatch = rawUrl.match(/#comments-(\d+)/);
-                        if (comMatch) codePath += "/C" + encodeBase62(parseInt(comMatch[1]));
-                    }
+            var codePath = "";
+            for (var j = pathSegments.length - 1; j >= 0; j--) {
+                var seg = pathSegments[j];
+                if (seg.toUpperCase() === "O" || /^[WTYIJDSOUPF][a-zA-Z0-9_\-\/]*$/i.test(seg)) {
+                    codePath = pathSegments.slice(j).join('/');
+                    break;
                 }
             }
 
-            if (!codePath) {
-                alert("対応していないURL、または解析できない形式です。");
-                return;
+            if (!codePath && pathSegments.length > 0) {
+                codePath = pathSegments[pathSegments.length - 1];
             }
 
-            const baseUrl = protocol + location.host + location.pathname.replace("index.html", "");
-            const finalShortUrl = (baseUrl.endsWith("/") ? baseUrl : baseUrl + "/") + codePath;
+            var targetUrl = "";
 
-            shortUrlOutput.value = finalShortUrl;
-            resultBox.style.display = "block";
-            document.getElementById('copyMsg').style.display = "none";
-        }
+            if (codePath) {
+                var upperCode = codePath.toUpperCase();
+                var prefix1 = upperCode.charAt(0);
+                var prefix2 = upperCode.substring(0, 2);
 
-        function copyUrl() {
-            const shortUrlOutput = document.getElementById('shortUrlOutput');
-            shortUrlOutput.select();
-            shortUrlOutput.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(shortUrlOutput.value).then(() => {
-                const msg = document.getElementById('copyMsg');
-                msg.style.display = "block";
-                setTimeout(() => { msg.style.display = "none"; }, 2000);
-            });
-        }
+                // 2文字プレフィックス（IT, IG, IU）の判定
+                if (prefix2 === "IT" || prefix2 === "IG" || prefix2 === "IU") {
+                    var prefix = prefix2;
+                    var rest = codePath.substring(2);
+                } else {
+                    var prefix = prefix1;
+                    var rest = codePath.substring(1);
+                }
+
+                if (prefix === "W") {
+                    targetUrl = "https://ja.scratch-wiki.info/wiki/" + rest;
+                } else if (prefix === "T") {
+                    var idT = decodeBase62(rest);
+                    targetUrl = "https://turbowarp.org/" + idT;
+                } else if (prefix === "Y") {
+                    targetUrl = "https://scratch.mit.edu/discuss/youtube/" + rest;
+                } else if (prefix === "IT") {
+                    var idIT = decodeBase62(rest);
+                    targetUrl = "https://uploads.scratch.mit.edu/projects/thumbnails/" + idIT + ".png";
+                } else if (prefix === "IG") {
+                    var idIG = decodeBase62(rest);
+                    targetUrl = "https://uploads.scratch.mit.edu/galleries/thumbnails/" + idIG + ".png";
+                } else if (prefix === "IU") {
+                    var idIU = decodeBase62(rest);
+                    targetUrl = "https://uploads.scratch.mit.edu/get_image/user/" + idIU + "_400x400.png";
+                } else if (prefix === "I") {
+                    var idI = decodeBase62(rest);
+                    targetUrl = "https://uploads.scratch.mit.edu/get_image/project/" + idI;
+                } else if (prefix === "J") {
+                    var idJ = decodeBase62(rest);
+                    targetUrl = "https://uploads.scratch.mit.edu/get_image/studio/" + idJ;
+                } else if (upperCode === "O") {
+                    targetUrl = "https://scratch.mit.edu/discuss/";
+                } else if (prefix === "D") {
+                    var partsD = rest.split("/C");
+                    var topicId = decodeBase62(partsD[0]);
+                    targetUrl = "https://scratch.mit.edu/discuss/topic/" + topicId;
+                    if (partsD[1]) {
+                        targetUrl += "#post-" + decodeBase62(partsD[1]);
+                    }
+                } else if (prefix === "S") {
+                    var idS = decodeBase62(rest);
+                    targetUrl = "https://scratch.mit.edu/studios/" + idS;
+                } else if (prefix === "U") {
+                    targetUrl = "https://scratch.mit.edu/users/" + rest;
+                } else if (prefix === "P") {
+                    var partsP = rest.split("/");
+                    var idP = decodeBase62(partsP[0]);
+                    targetUrl = "https://scratch.mit.edu/projects/" + idP;
+                    if (partsP[1] && partsP[1].toUpperCase() === "E") {
+                        targetUrl += "/E";
+                    } else if (partsP[1] === "埋") {
+                        targetUrl += "/embed";
+                    } else if (partsP[1] === "全") {
+                        targetUrl += "/fullscreen";
+                    } else if (partsP[1] && partsP[1].toUpperCase().indexOf("C") === 0) {
+                        targetUrl += "#comments-" + decodeBase62(partsP[1].substring(1));
+                    }
+                } else if (prefix === "F") {
+                    var partsF = rest.split("/");
+                    var user = partsF[1] ? partsF[1] : "scratch";
+                    targetUrl = "https://scratch.mit.edu/emails/welcome/" + user + "/1/";
+                }
+            }
+
+            if (targetUrl) {
+                var msgEl = document.getElementById('msg');
+                if (msgEl) {
+                    msgEl.innerHTML = 'Scratchの目的の場所まで移動しています...';
+                }
+                location.replace(targetUrl);
+            } else {
+                var msgEl2 = document.getElementById('msg');
+                if (msgEl2) {
+                    msgEl2.innerText = "無効な短縮リンクです。";
+                }
+            }
+        })();
     </script>
-    <iframe src="https://scratch.mit.edu/projects/1393853903/embed" allowtransparency="true" width="600" height="517" frameborder="0" scrolling="no" allowfullscreen></iframe>
 </body>
 </html>
