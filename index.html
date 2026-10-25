@@ -151,8 +151,8 @@
             } else if (rawUrl.includes("uploads.scratch.mit.edu/get_image/project/")) {
                 const match = rawUrl.match(/project\/(\d+)/);
                 if (match) codePath = "I" + encodeBase62(parseInt(match[1]));
-            } else if (rawUrl.includes("uploads.scratch.mit.edu/get_image/studio/")) {
-                const match = rawUrl.match(/studio\/(\d+)/);
+            } else if (rawUrl.includes("uploads.scratch.mit.edu/get_image/galleries/")) {
+                const match = rawUrl.match(/galleries\/(\d+)/);
                 if (match) codePath = "J" + encodeBase62(parseInt(match[1]));
             } else if (rawUrl.match(/\/discuss\/?$/) || rawUrl.includes("Scratch Around the World")) {
                 codePath = "O";
