@@ -43,8 +43,8 @@
             var codePath = "";
             for (var j = pathSegments.length - 1; j >= 0; j--) {
                 var seg = pathSegments[j];
-                // M と B のプレフィックス判定を追加
-                if (seg.toUpperCase() === "O" || /^[WTYIJDSMBUPF][a-zA-Z0-9_\-\/]*$/i.test(seg)) {
+                // プレフィックス判定に '2' を追加
+                if (seg.toUpperCase() === "O" || /^[2WTYIJDSMBUPF][a-zA-Z0-9_\-\/]*$/i.test(seg)) {
                     codePath = pathSegments.slice(j).join('/');
                     break;
                 }
@@ -70,51 +70,83 @@
                     var rest = codePath.substring(1);
                 }
 
+                // 1. Wiki: curid 形式 (W)
                 if (prefix === "W") {
+                    var idW = decodeBase62(rest);
+                    targetUrl = "https://ja.scratch-wiki.info/w/index.php?curid=" + idW;
+                } 
+                // 2. Wiki: 従来の記事名形式 (2)
+                else if (prefix === "2") {
                     targetUrl = "https://ja.scratch-wiki.info/wiki/" + rest;
-                } else if (prefix === "T") {
+                } 
+                // 3. TurboWarp (T)
+                else if (prefix === "T") {
                     var idT = decodeBase62(rest);
                     targetUrl = "https://turbowarp.org/" + idT;
-                } else if (prefix === "Y") {
+                } 
+                // 4. YouTube 埋め込み (Y)
+                else if (prefix === "Y") {
                     targetUrl = "https://scratch.mit.edu/discuss/youtube/" + rest;
-                } else if (prefix === "I") {
+                } 
+                // 5. 画像: プロジェクト (I)
+                else if (prefix === "I") {
                     var idIT = decodeBase62(rest);
                     targetUrl = "https://uploads.scratch.mit.edu/projects/thumbnails/" + idIT + ".png";
-                } else if (prefix === "IG") {
+                } 
+                else if (prefix === "IG") {
                     var idIG = decodeBase62(rest);
                     targetUrl = "https://uploads.scratch.mit.edu/galleries/thumbnails/" + idIG + ".png";
-                } else if (prefix === "IU") {
+                } 
+                else if (prefix === "IU") {
                     var idIU = decodeBase62(rest);
                     targetUrl = "https://uploads.scratch.mit.edu/get_image/user/" + idIU + "_400x400.png";
-                } else if (prefix === "J") {
+                } 
+                // 6. 画像: ギャラリー/スタジオ (J)
+                else if (prefix === "J") {
                     var idJ = decodeBase62(rest);
                     targetUrl = "https://uploads.scratch.mit.edu/galleries/thumbnails/" + idJ + ".png";
-                } else if (upperCode === "O") {
+                } 
+                // 7. フォーラムトップ (O)
+                else if (upperCode === "O") {
                     targetUrl = "https://scratch.mit.edu/discuss/";
-                } else if (prefix === "D") {
+                } 
+                // 8. フォーラムトピック (D)
+                else if (prefix === "D") {
                     var partsD = rest.split("/C");
                     var topicId = decodeBase62(partsD[0]);
                     targetUrl = "https://scratch.mit.edu/discuss/topic/" + topicId;
                     if (partsD[1]) {
                         targetUrl += "#post-" + decodeBase62(partsD[1]);
                     }
-                } else if (prefix === "S") {
+                } 
+                // 9. スタジオ (S)
+                else if (prefix === "S") {
                     var idS = decodeBase62(rest);
                     targetUrl = "https://scratch.mit.edu/studios/" + idS;
-                } else if (prefix === "U") {
-                    targetUrl = "https://scratch.mit.edu/users/" + rest;
-                } else if (prefix === "M") {
-                    // メッセージ数 API
+                } 
+                // 10. ユーザーページ & プロフィールコメント対応 (U)
+                else if (prefix === "U") {
+                    var partsU = rest.split("/C");
+                    targetUrl = "https://scratch.mit.edu/users/" + partsU[0];
+                    if (partsU[1]) {
+                        targetUrl += "#comments-" + decodeBase62(partsU[1]);
+                    }
+                } 
+                // 11. API: メッセージ数 (M)
+                else if (prefix === "M") {
                     targetUrl = "https://api.scratch.mit.edu/users/" + rest + "/messages/count";
-                } else if (prefix === "B") {
-                    // ユーザー情報 API
+                } 
+                // 12. API: ユーザー情報 (B)
+                else if (prefix === "B") {
                     targetUrl = "https://api.scratch.mit.edu/users/" + rest;
-                } else if (prefix === "P") {
+                } 
+                // 13. プロジェクト (P)
+                else if (prefix === "P") {
                     var partsP = rest.split("/");
                     var idP = decodeBase62(partsP[0]);
                     targetUrl = "https://scratch.mit.edu/projects/" + idP;
                     if (partsP[1] && partsP[1].toUpperCase() === "E") {
-                        targetUrl += "/E";
+                        targetUrl += "/editor";
                     } else if (partsP[1] === "埋") {
                         targetUrl += "/embed";
                     } else if (partsP[1] === "全") {
@@ -122,10 +154,10 @@
                     } else if (partsP[1] && partsP[1].toUpperCase().indexOf("C") === 0) {
                         targetUrl += "#comments-" + decodeBase62(partsP[1].substring(1));
                     }
-                } else if (prefix === "F") {
-                    var partsF = rest.split("/");
-                    var user = partsF[1] ? partsF[1] : "scratch";
-                    targetUrl = "https://scratch.mit.edu/emails/welcome/" + user + "/1/";
+                } 
+                // 14. ウェルカムメール (F直結)
+                else if (prefix === "F") {
+                    targetUrl = "https://scratch.mit.edu/emails/welcome/" + rest;
                 }
             }
 
