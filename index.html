@@ -156,15 +156,15 @@
                 const match = rawUrl.match(/\/users\/([^\/\?#]+)/);
                 if (match) codePath = "B" + match[1];
             } 
-            // 3. scratchviews: ユーザーリンク (またはScratchステータスのユーザーリンク)
+            // 3. scratchviews: ユーザーリンク
             else if (rawUrl.includes("scratchviews.com/users/")) {
                 const match = rawUrl.match(/\/users\/([^\/\?#]+)/);
                 if (match) codePath = "X" + match[1];
             }
-            // 4. scratchviews: プロジェクトリンク
+            // 4. scratchviews: プロジェクトリンク (IDをBase62圧縮)
             else if (rawUrl.includes("scratchviews.com/projects/")) {
                 const match = rawUrl.match(/\/projects\/(\d+)/);
-                if (match) codePath = "7" + match[1];
+                if (match) codePath = "7" + encodeBase62(parseInt(match[1]));
             }
             // 5. 通常: ユーザーページ & プロフィールコメント対応
             else if (rawUrl.includes("/users/")) {
